@@ -98,9 +98,17 @@ function App() {
       setPlayers(prev => prev.map(p => 
         p.id === eliminated!.id ? { ...p, isAlive: false } : p
       ));
+      setPhase('results');
+    } else {
+      // No one to eliminate (e.g., only 1 player left who can't vote)
+      const alivePlayersAfter = players.filter(p => p.isAlive);
+      if (alivePlayersAfter.length <= bunkerCapacity || currentRound >= maxRounds) {
+        setPhase('game-over');
+      } else {
+        setCurrentRound(prev => prev + 1);
+        setPhase('discussion');
+      }
     }
-    
-    setPhase('results');
   };
 
   const nextRound = () => {
