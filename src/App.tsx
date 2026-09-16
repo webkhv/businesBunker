@@ -126,7 +126,7 @@ function App() {
   const resetGame = () => {
     setPhase('setup');
     setPlayers([]);
-    setPlayerNames([]);
+    setPlayerNames(Array(numPlayers).fill(''));
     setVotes({});
     setEliminatedPlayer(null);
     setCurrentRound(1);
