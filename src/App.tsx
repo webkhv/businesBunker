@@ -15,7 +15,7 @@ type GamePhase = 'setup' | 'character-reveal' | 'discussion' | 'voting' | 'resul
 function App() {
   const [phase, setPhase] = useState<GamePhase>('setup');
   const [players, setPlayers] = useState<Player[]>([]);
-  const [playerNames, setPlayerNames] = useState<string[]>([]);
+  const [playerNames, setPlayerNames] = useState<string[]>(['', '', '', '']);
   const [numPlayers, setNumPlayers] = useState(4);
   const [currentCondition, setCurrentCondition] = useState(bunkerConditions[0]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -29,9 +29,12 @@ function App() {
     const condition = bunkerConditions[Math.floor(Math.random() * bunkerConditions.length)];
     setCurrentCondition(condition);
     
-    const newPlayers: Player[] = playerNames.map((name, idx) => ({
+    // Use numPlayers directly to ensure correct array length
+    const names = Array.from({ length: numPlayers }, (_, i) => playerNames[i] || `Игрок ${i + 1}`);
+    
+    const newPlayers: Player[] = names.map((name, idx) => ({
       id: idx,
-      name: name || `Игрок ${idx + 1}`,
+      name: name,
       character: generateCharacter(),
       isAlive: true,
       revealedTraits: [],
@@ -201,6 +204,10 @@ function App() {
   // CHARACTER REVEAL PHASE
   if (phase === 'character-reveal') {
     const currentPlayer = players[currentPlayerIndex];
+    if (!currentPlayer) {
+      setPhase('discussion');
+      return null;
+    }
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-green-900 to-gray-900 flex items-center justify-center p-4">
         <div className="max-w-lg w-full">
@@ -381,7 +388,7 @@ function App() {
                     {hasVoted ? (
                       <p className="text-green-300">
                         Голос отдан за: <span className="font-bold text-yellow-300">
-                          {players.find(p => p.id === votes[player.id])?.name}
+                          {players.find(p => p.id === votes[player.id])?.name ?? 'Неизвестно'}
                         </span>
                       </p>
                     ) : (
